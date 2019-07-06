@@ -15,6 +15,9 @@
   "require": {
     "php": "^7.1"
   },
+  "suggest": {
+    "ext-finfo": "PHP fileinfo extension is recommended for E-mail attachments"
+  },
   "autoload": {
     "psr-4": {
       "Comely\\Mailer\\": [
