@@ -13,7 +13,8 @@
     }
   ],
   "require": {
-    "php": "^7.1"
+    "php": "^7.1",
+    "ext-openssl": "*"
   },
   "suggest": {
     "ext-finfo": "PHP fileinfo extension is recommended for E-mail attachments"
