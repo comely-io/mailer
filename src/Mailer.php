@@ -13,7 +13,6 @@
 declare(strict_types=1);
 
 namespace Comely\Mailer;
-;
 
 use Comely\Mailer\Agents\EmailAgentInterface;
 use Comely\Mailer\Agents\Sendmail;
