@@ -26,9 +26,9 @@ use Comely\Mailer\Message\Sender;
 class Mailer
 {
     /** string Version (Major.Minor.Release-Suffix) */
-    public const VERSION = "1.0.10";
+    public const VERSION = "1.0.11";
     /** int Version (Major * 10000 + Minor * 100 + Release) */
-    public const VERSION_ID = 10010;
+    public const VERSION_ID = 10011;
 
     /** @var EmailAgentInterface */
     private $agent;
@@ -87,10 +87,18 @@ class Mailer
      * @param EmailAgentInterface $agent
      * @return Mailer
      */
-    public function agent(EmailAgentInterface $agent): self
+    public function setAgent(EmailAgentInterface $agent): self
     {
         $this->agent = $agent;
         return $this;
+    }
+
+    /**
+     * @return EmailAgentInterface
+     */
+    public function getAgent(): EmailAgentInterface
+    {
+        return $this->agent;
     }
 
     /**
