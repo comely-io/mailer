@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -25,13 +25,13 @@ use Comely\Mailer\Exception\InvalidEmailAddrException;
 class Sender
 {
     /** @var null|string */
-    private $name;
+    protected ?string $name = null;
     /** @var null|string */
-    private $email;
+    protected ?string $email = null;
 
     /**
-     * @param null|string $name
-     * @return Sender
+     * @param string $name
+     * @return $this
      */
     public function name(string $name): self
     {
@@ -41,7 +41,7 @@ class Sender
 
     /**
      * @param string $emailAddr
-     * @return Sender
+     * @return $this
      * @throws InvalidEmailAddrException
      */
     public function email(string $emailAddr): self

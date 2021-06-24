@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -23,15 +23,15 @@ use Comely\Mailer\Exception\EmailMessageException;
 class Attachment
 {
     /** @var string */
-    private $path;
+    private string $path;
     /** @var string */
-    private $type;
-    /** @var string */
-    private $name;
+    private string $name;
+    /** @var string|null */
+    private ?string $type = null;
     /** @var null|string */
-    private $id;
+    private ?string $id = null;
     /** @var string */
-    private $disposition;
+    private string $disposition;
 
     /**
      * Attachment constructor.
@@ -39,10 +39,10 @@ class Attachment
      * @param string|null $type
      * @throws EmailMessageException
      */
-    public function __construct(string $filePath, string $type = null)
+    public function __construct(string $filePath, ?string $type = null)
     {
         // Check if file exists and is readable
-        if (!@is_readable($filePath)) {
+        if (!is_readable($filePath)) {
             throw EmailMessageException::attachmentUnreadable($filePath);
         }
 
@@ -56,7 +56,6 @@ class Attachment
         if (!$this->type) {
             // Check if "fileinfo" extension is loaded
             if (extension_loaded("fileinfo")) {
-                /** @noinspection PhpComposerExtensionStubsInspection */
                 $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
                 $this->type = $fileInfo->file($this->path);
             } else {
@@ -134,40 +133,23 @@ class Attachment
      */
     public static function fileType(string $fileName): string
     {
-        switch (pathinfo($fileName, PATHINFO_EXTENSION)) {
-            case "txt":
-                return "text/plain";
-            case "zip":
-                return "application/zip";
-            case "tar":
-                return "application/x-tar";
-            case "pdf":
-                return "application/pdf";
-            case "psd":
-                return "image/vnd.adobe.photoshop";
-            case "swf":
-                return "application/x-shockwave-flash";
-            case "odt":
-                return "application/vnd.oasis.opendocument.text";
-            case "docx":
-                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            case "doc":
-                return "application/msword";
-            case "avi":
-                return "video/x-msvideo";
-            case "mp4":
-                return "video/mp4";
-            case "jpeg":
-            case "jpg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
-            case "gif":
-                return "image/gif";
-            case "svg":
-                return "image/svg+xml";
-            default:
-                return "application/octet-stream";
-        }
+        return match (pathinfo($fileName, PATHINFO_EXTENSION)) {
+            "txt" => "text/plain",
+            "zip" => "application/zip",
+            "tar" => "application/x-tar",
+            "pdf" => "application/pdf",
+            "psd" => "image/vnd.adobe.photoshop",
+            "swf" => "application/x-shockwave-flash",
+            "odt" => "application/vnd.oasis.opendocument.text",
+            "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "doc" => "application/msword",
+            "avi" => "video/x-msvideo",
+            "mp4" => "video/mp4",
+            "jpeg", "jpg" => "image/jpeg",
+            "png" => "image/png",
+            "gif" => "image/gif",
+            "svg" => "image/svg+xml",
+            default => "application/octet-stream",
+        };
     }
 }

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -27,19 +27,17 @@ use Comely\Mailer\Message\Sender;
 class Message
 {
     /** @var array */
-    private $attachments;
+    private array $attachments = [];
     /** @var array */
-    private $headers;
-    /** @var array */
-    private $recipients;
+    private array $headers = [];
     /** @var string */
-    private $subject;
+    protected string $subject = "";
     /** @var Body */
-    private $body;
+    private Body $body;
     /** @var Sender */
-    private $sender;
+    private Sender $sender;
     /** @var string */
-    private $eol;
+    private string $eol;
 
     /**
      * Message constructor.
@@ -47,9 +45,6 @@ class Message
      */
     public function __construct(Mailer $mailer)
     {
-        $this->attachments = [];
-        $this->headers = [];
-        $this->recipients = [];
         $this->subject = "";
         $this->body = new Body();
         $this->sender = clone $mailer->sender();

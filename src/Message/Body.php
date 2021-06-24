@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -23,9 +23,9 @@ namespace Comely\Mailer\Message;
 class Body
 {
     /** @var null|string */
-    private $plain;
+    protected ?string $plain = null;
     /** @var null|string */
-    private $html;
+    protected ?string $html = null;
 
     /**
      * @param string $body
