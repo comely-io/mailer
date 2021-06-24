@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -26,31 +26,31 @@ class SMTP implements EmailAgentInterface
     /** @var resource */
     private $stream;
     /** @var array */
-    private $streamOptions;
+    private array $streamOptions = [];
     /** @var string */
-    private $host;
+    private string $host;
     /** @var int */
-    private $port;
+    private int $port;
     /** @var bool */
-    private $secure;
+    private bool $secure = false;
+    /** @var string|null */
+    private ?string $username = null;
+    /** @var string|null */
+    private ?string $password = null;
     /** @var string */
-    private $username;
-    /** @var string */
-    private $password;
-    /** @var string */
-    private $serverName;
+    private string $serverName;
     /** @var int */
-    private $timeOut;
+    private int $timeOut;
+    /** @var bool */
+    private bool $keepAlive = false;
+    /** @var string */
+    private string $lastResponse = "";
+    /** @var int */
+    private int $lastResponseCode = 0;
+    /** @var string */
+    private string $eol = "\r\n";
     /** @var array */
-    private $options;
-    /** @var bool */
-    private $keepAlive;
-    /** @var string */
-    private $lastResponse;
-    /** @var int */
-    private $lastResponseCode;
-    /** @var string */
-    private $eol;
+    private array $options;
 
     /**
      * SMTP constructor.
@@ -61,16 +61,10 @@ class SMTP implements EmailAgentInterface
     public function __construct(string $host, int $port, int $timeOut = 1)
     {
         $this->stream = null;
-        $this->streamOptions = [];
         $this->host = $host;
         $this->port = $port;
         $this->timeOut = $timeOut;
-        $this->secure = false;
         $this->serverName = $_SERVER["SERVER_NAME"] ?? gethostname() ?: "localhost.localdomain";
-        $this->keepAlive = false;
-        $this->lastResponse = "";
-        $this->lastResponseCode = 0;
-        $this->eol = "\r\n";
         $this->options = [
             "startTLS" => false,
             "authLogin" => false,
@@ -157,8 +151,8 @@ class SMTP implements EmailAgentInterface
         if (!$this->stream) {
             $errorNum = 0;
             $errorMsg = "";
-            $context = @stream_context_create($this->streamOptions);
-            $this->stream = @stream_socket_client(
+            $context = stream_context_create($this->streamOptions);
+            $this->stream = stream_socket_client(
                 sprintf('%1$s:%2$d', $this->host, $this->port),
                 $errorNum,
                 $errorMsg,
@@ -188,7 +182,7 @@ class SMTP implements EmailAgentInterface
                 }
 
                 $this->command("STARTTLS", null, 220);
-                $tls = @stream_socket_enable_crypto($this->stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                $tls = stream_socket_enable_crypto($this->stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
                 if (!$tls) {
                     throw SMTP_Exception::tlsNegotiateFailed();
                 }
@@ -202,7 +196,7 @@ class SMTP implements EmailAgentInterface
                     $this->command("AUTH LOGIN", null, 334);
                     $this->command(base64_encode($this->username ?? " "), null, 334);
                     $this->command(base64_encode($this->password ?? " "), null, 235);
-                } catch (SMTP_Exception $e) {
+                } catch (SMTP_Exception) {
                     throw SMTP_Exception::authFailed($this->lastResponse);
                 }
             } elseif ($this->options["authPlain"] === true) {
@@ -218,7 +212,7 @@ class SMTP implements EmailAgentInterface
                 }
 
                 $this->command("NOOP", null, 250);
-            } catch (SMTP_Exception $e) {
+            } catch (SMTP_Exception) {
                 $this->stream = null;
                 $this->connect();
                 return;
@@ -228,9 +222,8 @@ class SMTP implements EmailAgentInterface
 
     /**
      * @param string $response
-     * @return array
      */
-    private function smtpServerOptions(string $response)
+    private function smtpServerOptions(string $response): void
     {
         // Default options
         $this->options = [
@@ -265,8 +258,6 @@ class SMTP implements EmailAgentInterface
                 }
             }
         }
-
-        return $this->options;
     }
 
     /**
