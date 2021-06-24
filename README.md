@@ -4,7 +4,7 @@ Send emails using server sendmail or built-in SMTP client
 
 ## Requirements
 
-* PHP >= 7.1
+* PHP ^8.0
 
 ## Installation
 
