@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/mailer" package.
  * https://github.com/comely-io/mailer
  *
@@ -20,14 +20,23 @@ namespace Comely\Mailer\Exception;
  */
 class SMTP_Exception extends MailerException
 {
+    /** @var int */
     public const CONNECTION_ERROR = 0x1a;
+    /** @var int */
     public const UNEXPECTED_RESPONSE = 0x1b;
+    /** @var int */
     public const TLS_NOT_AVAILABLE = 0x1c;
+    /** @var int */
     public const TLS_NEGOTIATE_FAIL = 0x1d;
+    /** @var int */
     public const INVALID_RECIPIENT = 0x14e;
+    /** @var int */
     public const AUTH_UNAVAILABLE = 0x1f;
+    /** @var int */
     public const AUTH_FAILED = 0x20;
+    /** @var int */
     public const EXCEEDS_MAX_SIZE = 0x21;
+    /** @var int */
     public const TIMED_OUT = 0x22;
 
     /**
