@@ -108,7 +108,7 @@ class Attachment
      */
     public function mime(): array
     {
-        $read = @file_get_contents($this->path);
+        $read = file_get_contents($this->path);
         if (!$read) {
             throw EmailMessageException::attachmentUnreadable($this->path);
         }
