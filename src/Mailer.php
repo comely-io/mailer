@@ -26,24 +26,26 @@ use Comely\Mailer\Message\Sender;
 class Mailer
 {
     /** string Version (Major.Minor.Release-Suffix) */
-    public const VERSION = "2.0.0";
+    public const VERSION = "2.1.0";
     /** int Version (Major * 10000 + Minor * 100 + Release) */
-    public const VERSION_ID = 20000;
+    public const VERSION_ID = 20100;
 
     /** @var EmailAgentInterface */
-    private EmailAgentInterface $agent;
-    /** @var Sender */
-    private Sender $defaultSender;
+    protected EmailAgentInterface $agent;
     /** @var string */
     protected string $eolChar;
+    /** @var Sender */
+    public readonly Sender $sender;
+    /** @var \Comely\Mailer\Templating */
+    public readonly Templating $templating;
 
     /**
      * Mailer constructor.
      */
     public function __construct()
     {
-        $this->defaultSender = new Sender();
         $this->agent = new Sendmail();
+        $this->sender = new Sender();
         $this->eolChar = "\r\n";
     }
 
@@ -53,9 +55,8 @@ class Mailer
      */
     public function __get(string $prop)
     {
-        switch ($prop) {
-            case "eolChar":
-                return $this->$prop;
+        if ($prop == "eolChar") {
+            return $this->$prop;
         }
 
         throw new \DomainException('Cannot get value of inaccessible property');
@@ -73,14 +74,6 @@ class Mailer
 
         $this->eolChar = $char;
         return $this;
-    }
-
-    /**
-     * @return Sender
-     */
-    public function sender(): Sender
-    {
-        return $this->defaultSender;
     }
 
     /**

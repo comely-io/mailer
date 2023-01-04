@@ -33,9 +33,9 @@ class Message
     /** @var string */
     protected string $subject = "";
     /** @var Body */
-    private Body $body;
+    public readonly Body $body;
     /** @var Sender */
-    private Sender $sender;
+    public readonly Sender $sender;
     /** @var string */
     private string $eol;
 
@@ -47,16 +47,8 @@ class Message
     {
         $this->subject = "";
         $this->body = new Body();
-        $this->sender = clone $mailer->sender();
+        $this->sender = clone $mailer->sender;
         $this->eol = $mailer->eolChar;
-    }
-
-    /**
-     * @return Sender
-     */
-    public function sender(): Sender
-    {
-        return $this->sender;
     }
 
     /**
@@ -67,14 +59,6 @@ class Message
     {
         $this->subject = $subject;
         return $this;
-    }
-
-    /**
-     * @return Body
-     */
-    public function body(): Body
-    {
-        return $this->body;
     }
 
     /**
