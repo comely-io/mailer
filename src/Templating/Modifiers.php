@@ -51,6 +51,10 @@ class Modifiers
         $this->register("ucwords", function (mixed $value) {
             return is_string($value) ? ucwords($value) : null;
         });
+
+        $this->register("trim", function (mixed $value) {
+            return is_string($value) ? trim($value) : null;
+        });
     }
 
     /**
