@@ -324,19 +324,19 @@ class SMTP implements EmailAgentInterface
     /**
      * Send email message(s)
      * @param Message $message
-     * @param array $emails
+     * @param array $recipients
      * @return int
      * @throws SMTP_Exception
      * @throws \Comely\Mailer\Exception\EmailMessageException
      */
-    public function send(Message $message, array $emails): int
+    public function send(Message $message, array $recipients): int
     {
         $this->connect(); // Establish or revive connection
         $this->command("RSET"); // Reset SMTP buffer
 
-        $this->command(sprintf('MAIL FROM:<%1$s>', $message->sender()->email), null, 250); // Set mail from
+        $this->command(sprintf('MAIL FROM:<%1$s>', $message->sender->email), null, 250); // Set mail from
         $count = 0;
-        foreach ($emails as $email) {
+        foreach ($recipients as $email) {
             $this->write(sprintf('RCPT TO:<%1$s>', $email));
             $this->read();
             if ($this->lastResponseCode !== 250) {

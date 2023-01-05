@@ -139,9 +139,8 @@ class TemplatedEmail
      */
     public function compose(): Message
     {
-        $message = $this->engine->mailer->compose();
+        $message = $this->engine->mailer->compose($this->subject);
         $message->body->html($this->generateHTML());
-        $message->subject($this->subject);
         return $message;
     }
 }

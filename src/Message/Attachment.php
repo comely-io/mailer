@@ -23,41 +23,36 @@ use Comely\Mailer\Exception\EmailMessageException;
 class Attachment
 {
     /** @var string */
-    private string $path;
+    public readonly string $name;
     /** @var string */
-    private string $name;
-    /** @var string|null */
-    private ?string $type = null;
-    /** @var null|string */
-    private ?string $id = null;
-    /** @var string */
-    private string $disposition;
+    public readonly string $contentType;
 
     /**
-     * Attachment constructor.
      * @param string $filePath
-     * @param string|null $type
-     * @throws EmailMessageException
+     * @param string|null $name
+     * @param string|null $contentType
+     * @param string $disposition
+     * @param string|null $contentId
+     * @throws \Comely\Mailer\Exception\EmailMessageException
      */
-    public function __construct(string $filePath, ?string $type = null)
+    public function __construct(
+        public readonly string  $filePath,
+        ?string                 $name = null,
+        ?string                 $contentType = null,
+        public readonly string  $disposition = "attachment",
+        public readonly ?string $contentId = null
+    )
     {
         // Check if file exists and is readable
-        if (!is_readable($filePath)) {
+        if (!is_file($this->filePath) || !is_readable($filePath)) {
             throw EmailMessageException::attachmentUnreadable($filePath);
         }
 
-        $this->path = $filePath; // Save file path
-        $this->type = $type; // Content type (if specified)
-        $this->name = basename($this->path);
-        $this->id = null;
-        $this->disposition = "attachment";
-
-        // Check if content type is not explicit
-        if (!$this->type) {
+        if (!$contentType) {
             // Check if "fileinfo" extension is loaded
             if (extension_loaded("fileinfo")) {
                 $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
-                $this->type = $fileInfo->file($this->path);
+                $contentType = $fileInfo->file($this->filePath);
             } else {
                 trigger_error(
                     'Recommend "fileinfo" extension for Attachments with Comely Mailer component',
@@ -65,41 +60,13 @@ class Attachment
                 );
             }
 
-            if (!$this->type) {
-                $this->type = self::fileType($this->name);
+            if (!$contentType) {
+                $contentType = self::fileType(basename($this->filePath));
             }
         }
-    }
 
-    /**
-     * @param string $name
-     * @return Attachment
-     */
-    public function name(string $name): self
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @param string $id
-     * @return Attachment
-     */
-    public function contentId(string $id): self
-    {
-        $this->id = $id;
-        $this->disposition = "inline";
-        return $this;
-    }
-
-    /**
-     * @param string $disposition
-     * @return Attachment
-     */
-    public function disposition(string $disposition): self
-    {
-        $this->disposition = $disposition;
-        return $this;
+        $this->name = $name ?? basename($this->filePath);
+        $this->contentType = $contentType;
     }
 
     /**
@@ -108,16 +75,16 @@ class Attachment
      */
     public function mime(): array
     {
-        $read = file_get_contents($this->path);
+        $read = file_get_contents($this->filePath);
         if (!$read) {
-            throw EmailMessageException::attachmentUnreadable($this->path);
+            throw EmailMessageException::attachmentUnreadable($this->filePath);
         }
 
-        $mime[] = sprintf('Content-Type: %1$s; name="%2$s"', $this->type, $this->name);
+        $mime[] = sprintf('Content-Type: %1$s; name="%2$s"', $this->contentType, $this->name);
         $mime[] = "Content-Transfer-Encoding: base64";
         $mime[] = sprintf('Content-Disposition: %1$s', $this->disposition);
-        if ($this->id) {
-            $mime[] = sprintf('Content-ID: <%1$s>', $this->id);
+        if ($this->contentId) {
+            $mime[] = sprintf('Content-ID: <%1$s>', $this->contentId);
         }
 
         $mime[] = chunk_split(base64_encode($read));
@@ -128,12 +95,12 @@ class Attachment
     /**
      * Get suggested content type from file extension, defaults to "octet-stream"
      *
-     * @param string $fileName
+     * @param string $basename
      * @return string
      */
-    public static function fileType(string $fileName): string
+    public static function fileType(string $basename): string
     {
-        return match (pathinfo($fileName, PATHINFO_EXTENSION)) {
+        return match (pathinfo($basename, PATHINFO_EXTENSION)) {
             "txt" => "text/plain",
             "zip" => "application/zip",
             "tar" => "application/x-tar",

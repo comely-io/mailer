@@ -22,7 +22,6 @@ use Comely\Mailer\Message\Sender;
 /**
  * Class Message
  * @package Comely\Mailer
- * @property-read string $subject
  */
 class Message
 {
@@ -30,8 +29,6 @@ class Message
     private array $attachments = [];
     /** @var array */
     private array $headers = [];
-    /** @var string */
-    protected string $subject = "";
     /** @var Body */
     public readonly Body $body;
     /** @var Sender */
@@ -40,25 +37,14 @@ class Message
     private string $eol;
 
     /**
-     * Message constructor.
-     * @param Mailer $mailer
+     * @param \Comely\Mailer\Mailer $mailer
+     * @param string $subject
      */
-    public function __construct(Mailer $mailer)
+    public function __construct(Mailer $mailer, public readonly string $subject)
     {
-        $this->subject = "";
         $this->body = new Body();
         $this->sender = clone $mailer->sender;
         $this->eol = $mailer->eolChar;
-    }
-
-    /**
-     * @param string $subject
-     * @return Message
-     */
-    public function subject(string $subject): self
-    {
-        $this->subject = $subject;
-        return $this;
     }
 
     /**
@@ -78,30 +64,33 @@ class Message
     }
 
     /**
-     * @param string $prop
-     * @return mixed
+     * @param string $filePath
+     * @param string|null $name
+     * @param string|null $contentType
+     * @param string $disposition
+     * @param string|null $contentId
+     * @return \Comely\Mailer\Message\Attachment
+     * @throws \Comely\Mailer\Exception\EmailMessageException
      */
-    public function __get(string $prop)
+    public function attach(
+        string  $filePath,
+        ?string $name = null,
+        ?string $contentType = null,
+        string  $disposition = "attachment",
+        ?string $contentId = null
+    ): Attachment
     {
-        switch ($prop) {
-            case "subject":
-                return $this->$prop;
-        }
-
-        throw new \DomainException('Cannot get value of inaccessible property');
+        $attachment = new Attachment($filePath, $name, $contentType, $disposition, $contentId);
+        $this->attachments[] = $attachment;
+        return $attachment;
     }
 
     /**
-     * @param string $filePath
-     * @param string|null $type
-     * @return Attachment
-     * @throws EmailMessageException
+     * @return array
      */
-    public function attach(string $filePath, string $type = null): Attachment
+    public function getAttachments(): array
     {
-        $attachment = new Attachment($filePath, $type);
-        $this->attachments[] = $attachment;
-        return $attachment;
+        return $this->attachments;
     }
 
     /**

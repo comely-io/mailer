@@ -24,22 +24,22 @@ class Sendmail implements EmailAgentInterface
 {
     /**
      * @param Message $message
-     * @param array $emails
+     * @param array $recipients
      * @return int
      * @throws \Comely\Mailer\Exception\EmailMessageException
      */
-    public function send(Message $message, array $emails): int
+    public function send(Message $message, array $recipients): int
     {
         $separator = sprintf('--MIME-SEPARATOR-%1$s', microtime(false));
         $messageMime = explode($separator, $message->compile($separator));
 
         $sendMail = mail(
-            implode(",", $emails),
+            implode(",", $recipients),
             $message->subject,
             $messageMime[1],
             $messageMime[0]
         );
 
-        return $sendMail ? count($emails) : 0;
+        return $sendMail ? count($recipients) : 0;
     }
 }

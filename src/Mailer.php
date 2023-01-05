@@ -95,11 +95,12 @@ class Mailer
     }
 
     /**
-     * @return Message
+     * @param string $subject
+     * @return \Comely\Mailer\Message
      */
-    public function compose(): Message
+    public function compose(string $subject): Message
     {
-        return new Message($this);
+        return new Message($this, $subject);
     }
 
     /**
