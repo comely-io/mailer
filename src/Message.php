@@ -17,6 +17,7 @@ namespace Comely\Mailer;
 use Comely\Mailer\Exception\EmailMessageException;
 use Comely\Mailer\Message\Attachment;
 use Comely\Mailer\Message\Body;
+use Comely\Mailer\Message\CompiledMIME;
 use Comely\Mailer\Message\Sender;
 
 /**
@@ -96,10 +97,10 @@ class Message
     /**
      * Get compiled email in MIME format
      * @param string $separator
-     * @return string
+     * @return CompiledMIME
      * @throws EmailMessageException
      */
-    public function compile(string $separator = ""): string
+    public function compile(string $separator = ""): CompiledMIME
     {
         // Boundaries
         $uniqueId = md5(uniqid(sprintf("%s-%s", $this->subject, microtime(false))));
@@ -156,7 +157,12 @@ class Message
 
         // Compile
         $mime = array_merge($headers, $body);
-        return implode($this->eol, $mime);
+        return new CompiledMIME(
+            $this->subject,
+            implode($this->eol, $mime),
+            $this->sender->name,
+            $this->sender->email
+        );
     }
 
     /**

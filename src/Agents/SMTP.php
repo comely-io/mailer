@@ -323,18 +323,22 @@ class SMTP implements EmailAgentInterface
 
     /**
      * Send email message(s)
-     * @param Message $message
+     * @param \Comely\Mailer\Message|\Comely\Mailer\Message\CompiledMIME $message
      * @param array $recipients
      * @return int
-     * @throws SMTP_Exception
      * @throws \Comely\Mailer\Exception\EmailMessageException
+     * @throws \Comely\Mailer\Exception\SMTP_Exception
      */
-    public function send(Message $message, array $recipients): int
+    public function send(Message|Message\CompiledMIME $message, array $recipients): int
     {
+        if ($message instanceof Message) {
+            $message = $message->compile();
+        }
+
         $this->connect(); // Establish or revive connection
         $this->command("RSET"); // Reset SMTP buffer
 
-        $this->command(sprintf('MAIL FROM:<%1$s>', $message->sender->email), null, 250); // Set mail from
+        $this->command(sprintf('MAIL FROM:<%1$s>', $message->senderEmail), null, 250); // Set mail from
         $count = 0;
         foreach ($recipients as $email) {
             $this->write(sprintf('RCPT TO:<%1$s>', $email));
@@ -346,14 +350,13 @@ class SMTP implements EmailAgentInterface
             $count++;
         }
 
-        $messageMime = $message->compile();
-        $messageMimeSize = strlen($messageMime);
+        $messageMimeSize = strlen($message->compiled);
         if ($this->options["size"] > 0 && $messageMimeSize > $this->options["size"]) {
             throw SMTP_Exception::exceedsMaximumSize($messageMimeSize, $this->options["size"]);
         }
 
         $this->command("DATA", null, 354);
-        $this->write($messageMime); // Write MIME
+        $this->write($message->compiled); // Write MIME
         $this->command(".", null, 250); // End DATA
 
         // Keep alive?

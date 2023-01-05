@@ -23,9 +23,9 @@ use Comely\Mailer\Message;
 interface EmailAgentInterface
 {
     /**
-     * @param \Comely\Mailer\Message $message
+     * @param \Comely\Mailer\Message|\Comely\Mailer\Message\CompiledMIME $message
      * @param array $recipients
      * @return int
      */
-    public function send(Message $message, array $recipients): int;
+    public function send(Message|Message\CompiledMIME $message, array $recipients): int;
 }

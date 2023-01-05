@@ -23,15 +23,19 @@ use Comely\Mailer\Message;
 class Sendmail implements EmailAgentInterface
 {
     /**
-     * @param Message $message
+     * @param \Comely\Mailer\Message|\Comely\Mailer\Message\CompiledMIME $message
      * @param array $recipients
      * @return int
      * @throws \Comely\Mailer\Exception\EmailMessageException
      */
-    public function send(Message $message, array $recipients): int
+    public function send(Message|Message\CompiledMIME $message, array $recipients): int
     {
+        if ($message instanceof Message) {
+            $message = $message->compile();
+        }
+
         $separator = sprintf('--MIME-SEPARATOR-%1$s', microtime(false));
-        $messageMime = explode($separator, $message->compile($separator));
+        $messageMime = explode($separator, $message->compiled);
 
         $sendMail = mail(
             implode(",", $recipients),

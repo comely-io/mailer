@@ -65,18 +65,21 @@ class MailGun implements EmailAgentInterface
     }
 
     /**
-     * @param \Comely\Mailer\Message $message
+     * @param \Comely\Mailer\Message|\Comely\Mailer\Message\CompiledMIME $message
      * @param array $recipients
      * @return int
      * @throws \Comely\Mailer\Exception\EmailMessageException
      * @throws \Comely\Mailer\Exception\MailGunException
      */
-    public function send(Message $message, array $recipients): int
+    public function send(Message|Message\CompiledMIME $message, array $recipients): int
     {
         $multipartFormData = false;
-        if ($this->builtInMIME) {
+        if ($this->builtInMIME || $message instanceof Message\CompiledMIME) {
             $multipartFormData = true;
-            $payload["message"] = new \CURLStringFile($message->compile(), "message");
+            $payload["message"] = new \CURLStringFile(
+                $message instanceof Message ? $message->compile()->compiled : $message->compiled,
+                "message"
+            );
         } else {
             $payload["from"] = sprintf("%s <%s>", $message->sender->name, $message->sender->email);
             $payload["subject"] = $message->subject;
