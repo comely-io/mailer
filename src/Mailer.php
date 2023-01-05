@@ -26,9 +26,9 @@ use Comely\Mailer\Message\Sender;
 class Mailer
 {
     /** string Version (Major.Minor.Release-Suffix) */
-    public const VERSION = "2.1.0";
+    public const VERSION = "2.1.1";
     /** int Version (Major * 10000 + Minor * 100 + Release) */
-    public const VERSION_ID = 20100;
+    public const VERSION_ID = 20101;
 
     /** @var EmailAgentInterface */
     protected EmailAgentInterface $agent;
