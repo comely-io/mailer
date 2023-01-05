@@ -25,7 +25,7 @@ class TemplatedEmail
      * @param string $subject
      * @throws \Comely\Mailer\Exception\DataBindException
      */
-    public function __construct(private readonly Templating $engine, Template $template, string $bodyHTML, private readonly string $subject)
+    public function __construct(private readonly Templating $engine, Template $template, string $bodyHTML, public readonly string $subject)
     {
         $this->html = preg_replace('/\{\{body}}/', $bodyHTML, $template->html);
         $this->bind = array_merge($this->engine->getBoundData(), $template->getBoundData());
