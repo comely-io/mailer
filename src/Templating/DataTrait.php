@@ -94,12 +94,12 @@ trait DataTrait
     }
 
     /**
-     * @param string|int|float|bool $value
+     * @param string|int|float|bool|null $value
      * @param array $key
-     * @return string|int
+     * @return string|int|null
      * @throws \Comely\Mailer\Exception\DataBindException
      */
-    private function sanitizeValue(string|int|float|bool $value, array $key): string|int
+    private function sanitizeValue(string|int|float|bool|null $value, array $key): string|int|null
     {
         if (is_bool($value)) {
             $value = (int)$value;
