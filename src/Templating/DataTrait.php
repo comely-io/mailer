@@ -109,6 +109,10 @@ trait DataTrait
             $value = strval($value);
         }
 
+        if (is_null($value)) {
+            return null;
+        }
+
         if (!is_string($value) && !is_int($value)) {
             throw new DataBindException(
                 sprintf('Invalid value of type "%s" for key "%s"', gettype($value), implode(".", $key))
